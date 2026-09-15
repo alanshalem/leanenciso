@@ -1,0 +1,107 @@
+---
+import { Icon } from 'astro-icon/components';
+import { herramientas } from '../data/herramientas';
+---
+
+<ul class="tools" data-reveal data-stagger="0.05">
+  {
+    herramientas.map((tool, i) => (
+      <li class="tool">
+        <span class="tool__n">{String(i + 1).padStart(2, '0')}</span>
+        <Icon class="tool__ico" name={tool.icon} />
+        <div class="tool__body">
+          <h3 class="tool__name">{tool.name}</h3>
+          <p class="tool__what">{tool.what}</p>
+        </div>
+        <span class="tool__kind">{tool.kind}</span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .tools {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .tool {
+    display: grid;
+    grid-template-columns: 3rem 2.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.25rem;
+    padding-block: clamp(1.1rem, 2.4vw, 1.75rem);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.35s;
+  }
+  .tool:hover {
+    background: rgb(242 240 235 / 0.02);
+  }
+
+  .tool__n {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+  }
+
+  .tool__ico {
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--color-paper);
+    transition: color 0.3s;
+  }
+  .tool:hover .tool__ico {
+    color: var(--color-acid);
+  }
+
+  .tool__body {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .tool__name {
+    font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .tool__what {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    max-width: 46ch;
+  }
+
+  .tool__kind {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 0.3rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 48rem) {
+    .tool {
+      grid-template-columns: 2rem 1.75rem minmax(0, 1fr);
+      gap: 0.9rem;
+      align-items: start;
+    }
+    .tool__kind {
+      grid-column: 3;
+      justify-self: start;
+      margin-top: 0.5rem;
+    }
+    .tool__ico {
+      width: 1.4rem;
+      height: 1.4rem;
+      margin-top: 0.2rem;
+    }
+  }
+</style>

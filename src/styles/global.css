@@ -1,0 +1,365 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/jetbrains-mono/index.css';
+
+/* ============================================================
+   FUENTES
+   Clash Display y Satoshi: Fontshare (ITF-FFL, uso comercial libre).
+   Ambas son variables: un archivo, todo el eje de peso.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/ClashDisplay-Variable.woff2') format('woff2-variations');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================
+   TOKENS
+   @theme los emite como CSS vars, asi que las utilidades de
+   Tailwind y los <style> de Astro comparten una sola fuente.
+   ============================================================ */
+
+@theme {
+  --color-ink: #0a0a0b;
+  --color-surface: #131316;
+  --color-raised: #1c1c1e;
+  --color-paper: #f2f0eb;
+  --color-acid: #d9ff3d;
+  --color-rec: #ff3b30;
+
+  --font-display: 'Clash Display', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Satoshi', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+:root {
+  --line: rgb(242 240 235 / 0.12);
+  --line-strong: rgb(242 240 235 / 0.24);
+  --muted: rgb(242 240 235 / 0.55);
+  --dim: rgb(242 240 235 / 0.35);
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --maxw: 90rem; /* 1440px */
+  --nav-h: 4.5rem;
+
+  /* Eje de peso del nombre. scrubber.ts lo mueve segun velocidad de scroll. */
+  --w-name: 700;
+
+  color-scheme: dark;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Lenis maneja el scroll suave; sin Lenis cae al nativo. */
+html:not(.lenis) {
+  scroll-behavior: smooth;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  font-weight: 400;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--color-acid);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-acid);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid var(--color-ink);
+  border-radius: 99px;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 60rem) {
+  .grid12 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 0;
+}
+
+/* Guias de columna: estructura visible, casi imperceptible. */
+.guides {
+  position: relative;
+}
+.guides::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--line) 0 1px,
+    transparent 1px calc(100% / 12)
+  );
+  background-clip: content-box;
+  opacity: 0.35;
+}
+
+/* ============================================================
+   TIPOGRAFIA
+   ============================================================ */
+
+.t-name {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 17vw, 17rem);
+  font-weight: var(--w-name);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.t-sec {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 7rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.t-lead {
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+  line-height: 1.35;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.t-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.t-muted {
+  color: var(--muted);
+}
+
+.acid {
+  color: var(--color-acid);
+}
+
+/* ============================================================
+   REVEALS
+   Estado inicial en CSS para que no haya flash antes de que
+   corra GSAP. motion.ts los anima; si no hay JS o hay
+   reduced-motion, .reveal-fallback los deja visibles.
+   ============================================================ */
+
+.js-motion [data-reveal] > *,
+.js-motion [data-reveal-self] {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  will-change: transform, opacity;
+}
+
+.js-motion [data-mask] > * {
+  clip-path: inset(0 0 100% 0);
+  will-change: clip-path;
+}
+
+/* ============================================================
+   CORTE SECO ENTRE PAGINAS
+   steps(1) = sin disolvencia. Sale, hay un frame de negro, entra.
+   ============================================================ */
+
+::view-transition-old(root) {
+  animation: vt-out 90ms steps(1, end) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-in 90ms 90ms steps(1, end) both;
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+/* ============================================================
+   MARQUESINA
+   ============================================================ */
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   No es opcional: se apaga todo y se muestra el estado final.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js-motion [data-reveal] > *,
+  .js-motion [data-reveal-self] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js-motion [data-mask] > * {
+    clip-path: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

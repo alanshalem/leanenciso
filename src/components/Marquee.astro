@@ -1,0 +1,75 @@
+---
+import { Icon } from 'astro-icon/components';
+import { herramientas } from '../data/herramientas';
+
+// Se duplica la lista: la animacion corre hasta -50% y reinicia sin salto.
+const loop = [...herramientas, ...herramientas];
+---
+
+<div class="mq" aria-hidden="true">
+  <div class="mq__track">
+    {
+      loop.map((tool) => (
+        <span class="mq__item">
+          <Icon class="mq__ico" name={tool.icon} />
+          {tool.name}
+          <span class="mq__key"></span>
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .mq {
+    overflow: hidden;
+    border-block: 1px solid var(--line);
+    padding-block: 1.1rem;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .mq__track {
+    display: flex;
+    width: max-content;
+    gap: 2.5rem;
+    animation: marquee 38s linear infinite;
+  }
+
+  .mq:hover .mq__track {
+    animation-play-state: paused;
+  }
+
+  .mq__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  .mq__ico {
+    width: 1.1em;
+    height: 1.1em;
+    color: var(--color-paper);
+  }
+
+  /* Rombo de keyframe como separador: el mismo lenguaje que la scrub bar. */
+  .mq__key {
+    width: 0.4em;
+    height: 0.4em;
+    margin-left: 0.75rem;
+    background: var(--color-acid);
+    rotate: 45deg;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mq__track {
+      animation: none;
+    }
+  }
+</style>

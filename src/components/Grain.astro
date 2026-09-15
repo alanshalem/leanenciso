@@ -1,0 +1,49 @@
+---
+// Grano de pelicula sobre todo el sitio. Sin imagenes: feTurbulence en un
+// data URI. Se apaga en reduced-motion y en touch (bateria).
+---
+
+<div class="grain" aria-hidden="true"></div>
+
+<style>
+  .grain {
+    position: fixed;
+    inset: -20%;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-repeat: repeat;
+    background-size: 220px 220px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    will-change: transform;
+    animation: grain 1.2s steps(1, end) infinite;
+  }
+
+  @keyframes grain {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    17% {
+      transform: translate3d(-3%, 2%, 0);
+    }
+    34% {
+      transform: translate3d(2%, -4%, 0);
+    }
+    50% {
+      transform: translate3d(-4%, -2%, 0);
+    }
+    67% {
+      transform: translate3d(3%, 3%, 0);
+    }
+    84% {
+      transform: translate3d(-2%, 4%, 0);
+    }
+  }
+
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .grain {
+      animation: none;
+    }
+  }
+</style>

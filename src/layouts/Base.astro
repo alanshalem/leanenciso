@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { site } from '../data/site';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Grain from '../components/Grain.astro';
+import Cursor from '../components/Cursor.astro';
+import Scrubber from '../components/Scrubber.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.role}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0a0a0b" />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/og.jpg', Astro.site ?? site.url).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link
+      rel="preload"
+      href="/fonts/ClashDisplay-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <ClientRouter />
+
+    <script is:inline>
+      // Antes del primer paint: si hay movimiento permitido, marcamos el html
+      // para que los reveals arranquen ocultos. Sin JS o con reduced-motion la
+      // clase nunca se agrega y todo se ve, que es el fallback correcto.
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var root = document.documentElement;
+        root.classList.add('js-motion');
+        // Red de seguridad: si el bundle de motion no llega a arrancar, la
+        // pagina quedaria con todo el contenido invisible. Preferimos perder
+        // la animacion antes que perder el contenido.
+        setTimeout(function () {
+          if (!root.dataset.motionReady) root.classList.remove('js-motion');
+        }, 3000);
+      }
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Saltar al contenido</a>
+
+    <Nav />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+    <Scrubber />
+    <Grain />
+    <Cursor />
+
+    <script>
+      import '../scripts/app';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip {
+    position: absolute;
+    left: -9999px;
+    z-index: 200;
+    padding: 0.75rem 1rem;
+    background: var(--color-acid);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .skip:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+</style>

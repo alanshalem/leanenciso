@@ -1,0 +1,376 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  src: string;
+  poster: string;
+  title: string;
+  /** Tipo de pieza. Va arriba del título. */
+  formato: string;
+  duration?: string;
+  class?: string;
+}
+
+const { src, poster, title, formato, duration, class: className } = Astro.props;
+---
+
+<figure class:list={['clip', className]} data-clip>
+  <div class="phone">
+    <div class="screen">
+      <!-- Franja superior: barra de estado y Dynamic Island. -->
+      <div class="screen__top" aria-hidden="true">
+        <div class="sb">
+          <span class="sb__side sb__time">9:41</span>
+          <span class="sb__side">
+            <Icon class="sb__ico" name="lucide:signal" />
+            <Icon class="sb__ico" name="lucide:wifi" />
+            <Icon class="sb__ico sb__ico--bat" name="lucide:battery-full" />
+          </span>
+        </div>
+        <span class="island"></span>
+      </div>
+
+      <!-- El reel entero, sin recortar: un 9:16 dentro de una pantalla 9:19.5
+           deja franjas negras arriba y abajo, como en un celular real. -->
+      <div class="screen__video">
+        <video
+          data-autoplay
+          src={src}
+          poster={poster}
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label={title}
+        ></video>
+      </div>
+
+      <!-- Franja inferior: progreso, sonido e indicador de inicio. -->
+      <div class="screen__bottom" aria-hidden="true">
+        <span class="prog"><span class="prog__fill" data-progress></span></span>
+        <span class="pill">
+          <Icon class="pill__ico pill__off" name="lucide:volume-x" />
+          <Icon class="pill__ico pill__on" name="lucide:volume-2" />
+          <span class="pill__off">Activar sonido</span>
+          <span class="pill__on">Silenciar</span>
+        </span>
+        <span class="homebar"></span>
+      </div>
+
+      <!-- Toda la pantalla es el botón: tocar en cualquier lado prende o apaga el sonido. -->
+      <button
+        class="snd"
+        type="button"
+        data-audio-toggle
+        aria-pressed="false"
+        aria-label={`Sonido: ${title}`}
+        data-cursor-label="SONIDO"
+      ></button>
+    </div>
+
+    <span class="side side--silent" aria-hidden="true"></span>
+    <span class="side side--up" aria-hidden="true"></span>
+    <span class="side side--down" aria-hidden="true"></span>
+    <span class="side side--power" aria-hidden="true"></span>
+  </div>
+
+  <figcaption class="meta">
+    <span class="meta__fmt">{formato}</span>
+    <span class="meta__title">{title}</span>
+    {duration && <span class="meta__dur">{duration}</span>}
+  </figcaption>
+</figure>
+
+<style>
+  .clip {
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+    position: relative;
+  }
+
+  /* --- Chasis ----------------------------------------------------------- */
+
+  .phone {
+    position: relative;
+    aspect-ratio: 9 / 19.5;
+    /* Radios en porcentaje con barra: elípticos y proporcionales, como un
+       chasis real a cualquier escala. */
+    border-radius: 11.5% / 5.3%;
+    padding: 2.6%;
+    background: linear-gradient(160deg, #3a3a3f 0%, #16161a 22%, #101013 55%, #2e2e33 100%);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.6),
+      inset 0 0 0 1px rgb(255 255 255 / 0.05),
+      0 30px 70px -30px rgb(0 0 0 / 0.9);
+    isolation: isolate;
+  }
+
+  /* Resplandor acid: aparece al pasar el mouse y queda prendido mientras suena. */
+  .phone::before {
+    content: '';
+    position: absolute;
+    inset: 12% 6% 6%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(217 255 61 / 0.22), transparent 72%);
+    filter: blur(28px);
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out-expo);
+  }
+  .clip:hover .phone::before,
+  .clip[data-audio] .phone::before {
+    opacity: 1;
+  }
+
+  .side {
+    position: absolute;
+    width: 2px;
+    background: linear-gradient(to right, #4a4a50, #232328);
+    border-radius: 2px;
+  }
+  .side--silent {
+    left: -2px;
+    top: 16%;
+    height: 4%;
+  }
+  .side--up {
+    left: -2px;
+    top: 24%;
+    height: 8%;
+  }
+  .side--down {
+    left: -2px;
+    top: 35%;
+    height: 8%;
+  }
+  .side--power {
+    right: -2px;
+    top: 27%;
+    height: 12%;
+  }
+
+  /* --- Pantalla ---------------------------------------------------------- */
+
+  /* Contenedor de consulta: todo lo de adentro se mide en cqw, así la barra de
+     estado y el botón escalan con el tamaño del celular. */
+  .screen {
+    position: relative;
+    height: 100%;
+    border-radius: 9.4% / 4.5%;
+    overflow: hidden;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+
+  .screen__top,
+  .screen__bottom {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  .screen__video {
+    position: relative;
+    flex: none;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background: #000;
+  }
+
+  .screen__video video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* --- Barra de estado --------------------------------------------------- */
+
+  .sb {
+    position: absolute;
+    inset: 0 0 auto 0;
+    /* Centrada en la altura de la isla: 4.9cqw + 7.6cqw / 2 = 8.7cqw. */
+    height: 17.4cqw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+
+  /* Cada lado ocupa la "oreja" que deja la isla y centra su contenido. */
+  .sb__side {
+    width: 34.5cqw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.1cqw;
+  }
+
+  .sb__time {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', var(--font-sans);
+    font-size: max(0.4375rem, 5.4cqw);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sb__ico {
+    width: max(0.4375rem, 4.4cqw);
+    height: max(0.4375rem, 4.4cqw);
+  }
+  .sb__ico--bat {
+    width: max(0.5625rem, 5.6cqw);
+    height: max(0.5625rem, 5.6cqw);
+  }
+
+  .island {
+    position: absolute;
+    top: 4.9cqw;
+    left: 50%;
+    translate: -50% 0;
+    width: 31cqw;
+    height: 7.6cqw;
+    border-radius: 99px;
+    background: #000;
+    /* Sobre la franja negra la isla desaparece; un borde mínimo la sostiene. */
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+
+  /* --- Franja inferior ----------------------------------------------------- */
+
+  .prog {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: max(2px, 0.9cqw);
+    background: rgb(255 255 255 / 0.16);
+    overflow: hidden;
+  }
+
+  .prog__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-acid);
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+  }
+
+  .pill {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.8cqw;
+    padding: 2.2cqw 4.4cqw;
+    border-radius: 99px;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: max(0.4375rem, 4.1cqw);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      background 0.25s,
+      color 0.25s,
+      box-shadow 0.25s,
+      scale 0.3s var(--ease-out-expo);
+  }
+
+  .pill__ico {
+    flex: none;
+    width: max(0.5rem, 5cqw);
+    height: max(0.5rem, 5cqw);
+  }
+
+  .pill__on {
+    display: none;
+  }
+
+  .clip[data-audio] .pill {
+    background: rgb(10 10 11 / 0.85);
+    color: var(--color-acid);
+    box-shadow: inset 0 0 0 1px var(--color-acid);
+  }
+  .clip[data-audio] .pill__off {
+    display: none;
+  }
+  .clip[data-audio] span.pill__on {
+    display: inline;
+  }
+  .clip[data-audio] svg.pill__on {
+    display: block;
+  }
+
+  .screen:has(.snd:hover) .pill {
+    scale: 1.06;
+  }
+
+  .homebar {
+    position: absolute;
+    left: 50%;
+    bottom: 3.4cqw;
+    translate: -50% 0;
+    width: 36cqw;
+    height: max(2px, 1.3cqw);
+    border-radius: 99px;
+    background: rgb(255 255 255 / 0.55);
+  }
+
+  /* --- Botón de sonido ----------------------------------------------------- */
+
+  .snd {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  /* El overflow de la pantalla recortaría un outline exterior. */
+  .snd:focus-visible {
+    outline: 2px solid var(--color-acid);
+    outline-offset: -3px;
+  }
+
+  /* --- Ficha ------------------------------------------------------------- */
+
+  .meta {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .meta__fmt {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-acid);
+  }
+
+  .meta__title {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .meta__dur {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+  }
+</style>

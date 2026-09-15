@@ -1,0 +1,36 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<span class={className} data-localtime data-tz={site.timezone}>--:--:--</span>
+
+<script>
+  function tick() {
+    document.querySelectorAll<HTMLElement>('[data-localtime]').forEach((el) => {
+      const tz = el.dataset.tz || 'America/Argentina/Buenos_Aires';
+      el.textContent = new Intl.DateTimeFormat('es-AR', {
+        timeZone: tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      }).format(new Date());
+    });
+  }
+
+  let timer: number | undefined;
+
+  function start() {
+    tick();
+    window.clearInterval(timer);
+    timer = window.setInterval(tick, 1000);
+  }
+
+  document.addEventListener('astro:page-load', start);
+  document.addEventListener('astro:before-swap', () => window.clearInterval(timer));
+</script>

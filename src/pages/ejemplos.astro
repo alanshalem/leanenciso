@@ -1,0 +1,124 @@
+---
+import { getCollection } from 'astro:content';
+
+import Base from '../layouts/Base.astro';
+import IphoneFrame from '../components/IphoneFrame.astro';
+import Cta from '../components/Cta.astro';
+
+const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Ejemplos"
+  description="Reels editados por Leandro Enciso. Tocá la pantalla de cualquiera para escucharlo."
+>
+  <!-- =========================================================== HEAD -->
+  <section class="wrap head">
+    <p class="t-label head__label">SEC 03 <span>Ejemplos</span></p>
+    <h1 class="head__title" data-mask>
+      <span>Reels</span>
+      <span>con sonido.</span>
+    </h1>
+    <p class="head__sub" data-reveal-self>
+      {reels.length} piezas verticales. Tocá la pantalla de cualquiera para activar el sonido.
+    </p>
+  </section>
+
+  <!-- ========================================================== REELS -->
+  <section class="wrap listado" data-sec="Reels">
+    <div class="reels" data-reveal data-stagger="0.06">
+      {
+        reels.map((r) => (
+          <div class="reels__item">
+            <IphoneFrame
+              src={r.data.video}
+              poster={r.data.poster}
+              title={r.data.title}
+              formato={r.data.formato}
+              duration={r.data.duration}
+            />
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <Cta title="¿Querés algo así para lo tuyo?" body="Mandame el material y vemos qué se puede sacar." />
+</Base>
+
+<style>
+  .head {
+    padding-top: calc(var(--nav-h) + clamp(2rem, 6vw, 5rem));
+    padding-bottom: clamp(1.5rem, 4vw, 3rem);
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+
+  .head__label {
+    display: flex;
+    gap: 1rem;
+    color: var(--color-acid);
+  }
+  .head__label span {
+    color: var(--muted);
+  }
+
+  .head__title {
+    display: grid;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 9.5vw, 9rem);
+    font-weight: 600;
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+  .head__title span:nth-child(2) {
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .head__sub {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    max-width: 46ch;
+    line-height: 1.7;
+  }
+
+  .listado {
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .reels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(2.5rem, 5vw, 4.5rem) clamp(1rem, 4vw, 4rem);
+    justify-items: center;
+    padding-top: clamp(1rem, 3vw, 2rem);
+  }
+
+  .reels__item {
+    width: 100%;
+    max-width: 16rem;
+  }
+
+  @media (max-width: 56rem) {
+    .reels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* En un celular real, un reel por fila: a dos columnas el botón de sonido
+     queda demasiado chico para el dedo. */
+  @media (max-width: 30rem) {
+    .reels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .reels__item {
+      max-width: 15rem;
+    }
+  }
+</style>

@@ -1,0 +1,279 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import Base from '../layouts/Base.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import ToolGrid from '../components/ToolGrid.astro';
+import Marquee from '../components/Marquee.astro';
+import IphoneFrame from '../components/IphoneFrame.astro';
+import Cta from '../components/Cta.astro';
+import { site, proceso } from '../data/site';
+
+// En lugar de un retrato de relleno, un reel que no aparece en el home.
+const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
+const muestra = reels.find((r) => !r.data.hero && !r.data.featured) ?? reels[0];
+---
+
+<Base
+  title="Quién soy"
+  description={`Leandro Enciso, ${site.age} años, editor de video en ${site.country}. Con qué herramientas y cómo trabaja.`}
+>
+  <!-- =========================================================== HEAD -->
+  <section class="wrap head">
+    <p class="t-label head__label">SEC 02 <span>Quién soy</span></p>
+    <h1 class="head__title" data-mask>
+      <span>Hola, soy</span>
+      <span>Leandro.</span>
+    </h1>
+    <p class="head__sub" data-reveal-self>
+      {site.age} años · {site.country} · {site.role}
+    </p>
+  </section>
+
+  <!-- ============================================================ BIO -->
+  <section class="wrap bio" data-sec="Quién soy">
+    {
+      muestra && (
+        <div class="bio__phone">
+          <IphoneFrame
+            src={muestra.data.video}
+            poster={muestra.data.poster}
+            title={muestra.data.title}
+            formato={muestra.data.formato}
+            duration={muestra.data.duration}
+          />
+        </div>
+      )
+    }
+
+    <div class="bio__text" data-reveal data-stagger="0.08">
+      <p class="bio__lead">
+        Soy editor de video. Tengo {site.age} años y trabajo desde {site.country}.
+      </p>
+
+      <p>
+        Edito reels y contenido vertical para redes: piezas donde los primeros segundos deciden si
+        alguien se queda o sigue de largo.
+      </p>
+
+      <p class="bio__beat">
+        Un video no se arregla en la edición.<br />
+        <span class="acid">Se define ahí.</span>
+      </p>
+
+      <p>
+        Trabajo con Premiere Pro, CapCut, Photoshop y Canva, y me apoyo en Claude y ChatGPT para
+        ordenar ideas y textos.
+      </p>
+
+      <p>
+        <a class="more" href="/ejemplos" data-cursor-label="VER">
+          Ver los reels
+          <Icon name="lucide:arrow-up-right" />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================================================== HERRAMIENTAS -->
+  <Marquee />
+
+  <section class="wrap">
+    <SectionHeader num="03" title="Con qué trabajo" kicker="Herramientas" />
+    <ToolGrid />
+  </section>
+
+  <!-- ========================================================= PROCESO -->
+  <section class="wrap proceso">
+    <SectionHeader num="04" title="Cómo trabajo" kicker="Proceso" />
+
+    <ol class="proc" data-reveal data-stagger="0.06">
+      {
+        proceso.map((step) => (
+          <li class="proc__step">
+            <span class="proc__n">{step.n}</span>
+            <h3 class="proc__title">{step.title}</h3>
+            <p class="proc__text">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <Cta title="¿Arrancamos?" body="Contame qué tenés y qué querés lograr." />
+</Base>
+
+<style>
+  /* ------------------------------------------------------------- HEAD */
+
+  .head {
+    padding-top: calc(var(--nav-h) + clamp(2rem, 6vw, 5rem));
+    padding-bottom: clamp(2rem, 6vw, 5rem);
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+
+  .head__label {
+    display: flex;
+    gap: 1rem;
+    color: var(--color-acid);
+  }
+  .head__label span {
+    color: var(--muted);
+  }
+
+  .head__title {
+    display: grid;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8.5vw, 8rem);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .head__title span:nth-child(2) {
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .head__sub {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* -------------------------------------------------------------- BIO */
+
+  .bio {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  .bio__phone {
+    width: 100%;
+    max-width: 15rem;
+    justify-self: center;
+    position: sticky;
+    top: calc(var(--nav-h) + 2rem);
+    height: max-content;
+  }
+
+  .bio__text {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+    align-content: start;
+    max-width: 48ch;
+    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .bio__lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.028em;
+    color: var(--color-paper);
+  }
+
+  .bio__beat {
+    font-family: var(--font-display);
+    font-size: clamp(1.375rem, 2.8vw, 2.125rem);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--color-paper);
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--color-acid);
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-paper);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line-strong);
+    transition: border-color 0.3s;
+  }
+  .more:hover {
+    border-color: var(--color-acid);
+    color: var(--color-acid);
+  }
+  .more svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    transition: translate 0.3s var(--ease-out-expo);
+  }
+  .more:hover svg {
+    translate: 0.15rem -0.15rem;
+  }
+
+  @media (max-width: 60rem) {
+    .bio {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .bio__phone {
+      position: static;
+      justify-self: start;
+    }
+  }
+
+  /* ---------------------------------------------------------- PROCESO */
+
+  .proceso {
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .proc {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .proc__step {
+    background: var(--color-ink);
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    transition: background 0.35s;
+  }
+  .proc__step:hover {
+    background: var(--color-surface);
+  }
+
+  .proc__n {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--color-acid);
+  }
+
+  .proc__title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .proc__text {
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+</style>

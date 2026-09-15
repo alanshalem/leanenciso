@@ -1,0 +1,427 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import Base from '../layouts/Base.astro';
+import IphoneFrame from '../components/IphoneFrame.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Marquee from '../components/Marquee.astro';
+import ToolGrid from '../components/ToolGrid.astro';
+import Cta from '../components/Cta.astro';
+import LocalTime from '../components/LocalTime.astro';
+import { site } from '../data/site';
+
+const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
+const hero = reels.find((r) => r.data.hero) ?? reels[0];
+const destacados = reels.filter((r) => r.data.featured && r.id !== hero?.id).slice(0, 3);
+const year = new Date().getFullYear();
+---
+
+<Base>
+  <!-- ============================================================ HERO -->
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <div class="hero__meta">
+        <span class="t-label">{site.role}</span>
+        <span class="t-label hero__where">
+          {site.country} · <LocalTime class="acid" />
+        </span>
+        <span class="t-label">Portfolio {year}</span>
+      </div>
+
+      <div class="hero__stage">
+        <h1 class="t-name hero__name" data-mask>
+          <span class="hero__line" aria-hidden="true">Leandro</span>
+          <span class="hero__line hero__line--2" aria-hidden="true">Enciso</span>
+          <span class="sr-only">Leandro Enciso</span>
+        </h1>
+
+        {
+          hero && (
+            <div class="hero__phone" data-parallax="40">
+              <IphoneFrame
+                src={hero.data.video}
+                poster={hero.data.poster}
+                title={hero.data.title}
+                formato={hero.data.formato}
+                duration={hero.data.duration}
+              />
+            </div>
+          )
+        }
+      </div>
+
+      <div class="hero__foot">
+        <p class="hero__tag">{site.tagline}</p>
+        <span class="hero__cue">
+          <span class="t-label">Scroll</span>
+          <span class="hero__line-v"></span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== INTRO -->
+  <section class="wrap intro" data-sec="Quién habla">
+    <p class="t-label intro__label">SEC 01 <span>Quién habla</span></p>
+
+    <div class="intro__body" data-reveal data-stagger="0.09">
+      <p class="intro__lead">
+        Empecé editando videos de amigos que no tenían plata para pagarme.<br />
+        Ahora edito para gente que sí.
+      </p>
+
+      <p>
+        Tengo {site.age} y soy de Argentina. Mi laburo es fácil de explicar y difícil de hacer: me
+        das tres horas de material crudo y te devuelvo los cuarenta segundos que nadie saltea.
+      </p>
+
+      <p class="intro__beat">
+        Corte. Ritmo. El silencio en el lugar exacto.<br />
+        <span class="acid">Todo lo demás son efectos.</span>
+      </p>
+
+      <p>
+        No creo en el video «bien editado». Creo en el video que retiene. Si a los dos segundos el
+        que mira ya se fue, el color grading no importa.
+      </p>
+
+      <p>
+        Uso Premiere, CapCut, Photoshop y Canva. También Claude y ChatGPT — pelearse con la
+        herramienta no te hace más artista, te hace más lento.
+      </p>
+
+      <p class="intro__close">
+        Llegaste hasta acá abajo.<br />
+        Eso también es edición.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================================================== HERRAMIENTAS -->
+  <Marquee />
+
+  <section class="wrap">
+    <SectionHeader num="02" title="Con qué trabajo" kicker="Herramientas" />
+    <ToolGrid />
+  </section>
+
+  <!-- ========================================================== REELS -->
+  {
+    destacados.length > 0 && (
+      <section class="wrap trabajos">
+        <SectionHeader num="03" title="Trabajos" kicker="Tocá para escuchar" />
+
+        <div class="reels" data-reveal data-stagger="0.07">
+          {destacados.map((r, i) => (
+            <div class="reels__item">
+              {/* El parallax va en un envoltorio propio: el reveal ya anima la Y del item. */}
+              <div data-parallax={i === 1 ? '0' : '30'}>
+                <IphoneFrame
+                  src={r.data.video}
+                  poster={r.data.poster}
+                  title={r.data.title}
+                  formato={r.data.formato}
+                  duration={r.data.duration}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <a class="more" href="/ejemplos" data-cursor-label="VER">
+          Ver todos los reels
+          <Icon name="lucide:arrow-up-right" />
+        </a>
+      </section>
+    )
+  }
+
+  <Cta />
+</Base>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* ------------------------------------------------------------- HERO */
+
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    align-items: stretch;
+    padding-top: var(--nav-h);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 1.5rem;
+    /* El fondo deja aire para la scrub bar fija. */
+    padding-block: 1.5rem 5rem;
+    width: 100%;
+  }
+
+  .hero__meta {
+    /* Por encima del celular: con parallax puede subir hasta esta fila. */
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero__where {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+
+  /* "LEANDRO" mide 4.778em en Clash Display 700 con este tracking. En desktop
+     el nombre ocupa el ancho menos la columna del celular: el celular es más
+     alto que una línea de texto y, a ancho completo, tapaba la última letra.
+     --phone-w se declara acá pero sus cqw se resuelven donde se usa, contra
+     este contenedor. Se recorta por altura en pantallas bajas. */
+  .hero__stage {
+    --phone-w: min(21cqw, 20svh, 12rem);
+    position: relative;
+    container-type: inline-size;
+    display: grid;
+    align-content: center;
+  }
+
+  .hero__name {
+    display: grid;
+    font-size: min(calc((100cqw - var(--phone-w) - 2rem) / 4.778), 30svh);
+  }
+
+  .hero__line {
+    display: block;
+  }
+  /* Contraste por peso, no por contorno: el contorno ensucia las barras
+     horizontales de E y L a este tamaño. Además muestra el eje variable. */
+  .hero__line--2 {
+    font-weight: 300;
+    color: rgb(242 240 235 / 0.78);
+  }
+
+  /* Se apoya en el aire que deja "ENCISO", que es más corto que "LEANDRO".
+     El tope en svh evita que un marco 9:19.5 se estire por encima de la nav
+     en pantallas bajas: 20svh de ancho son 43svh de alto. */
+  .hero__phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: var(--phone-w);
+    z-index: 2;
+  }
+
+  .hero__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .hero__tag {
+    font-size: clamp(1rem, 1.7vw, 1.375rem);
+    font-weight: 500;
+    max-width: 34ch;
+    letter-spacing: -0.01em;
+  }
+
+  .hero__cue {
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+  }
+
+  .hero__line-v {
+    width: 1px;
+    height: 3rem;
+    background: linear-gradient(to bottom, var(--color-acid), transparent);
+    animation: cue 2.4s var(--ease-in-out-quart) infinite;
+    transform-origin: top;
+  }
+
+  @keyframes cue {
+    0%,
+    100% {
+      scale: 1 0.25;
+      opacity: 0.4;
+    }
+    45% {
+      scale: 1 1;
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 60rem) {
+    .hero__stage {
+      gap: 2rem;
+    }
+    /* En mobile el celular baja debajo del nombre: vuelve el ancho completo. */
+    .hero__name {
+      font-size: min(20.6cqw, 30svh);
+    }
+    .hero__phone {
+      position: static;
+      width: clamp(9rem, 40cqw, 12rem);
+      justify-self: end;
+    }
+    .hero__foot {
+      flex-direction: column;
+      align-items: start;
+    }
+    .hero__cue {
+      display: none;
+    }
+  }
+
+  /* ------------------------------------------------------------ INTRO */
+
+  .intro {
+    padding-block: clamp(5rem, 14vw, 12rem);
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  .intro__label {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    position: sticky;
+    top: calc(var(--nav-h) + 1.5rem);
+    height: max-content;
+    color: var(--color-acid);
+  }
+  .intro__label span {
+    color: var(--muted);
+  }
+
+  .intro__body {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    max-width: 46ch;
+    font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .intro__lead {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 3.25rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--color-paper);
+  }
+
+  .intro__beat {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--color-paper);
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--color-acid);
+  }
+
+  .intro__close {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.4vw, 2rem);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-paper);
+  }
+
+  @media (max-width: 60rem) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .intro__label {
+      position: static;
+      display: flex;
+      gap: 1rem;
+    }
+  }
+
+  /* ------------------------------------------------------------ REELS */
+
+  .trabajos {
+    padding-bottom: clamp(3rem, 8vw, 6rem);
+  }
+
+  .reels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1.5rem, 4vw, 4rem);
+    justify-items: center;
+    padding-block: 1rem 3rem;
+  }
+
+  .reels__item {
+    width: 100%;
+    max-width: 15rem;
+  }
+
+  /* El del medio baja: rompe la línea de base plana. */
+  .reels__item:nth-child(2) {
+    margin-top: clamp(1.5rem, 5vw, 4.5rem);
+  }
+
+  @media (max-width: 48rem) {
+    .reels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 2rem 1rem;
+    }
+    .reels__item:nth-child(2) {
+      margin-top: 2.5rem;
+    }
+  }
+
+  @media (max-width: 26rem) {
+    .reels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .reels__item:nth-child(2) {
+      margin-top: 0;
+    }
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line-strong);
+    transition: border-color 0.3s;
+  }
+  .more:hover {
+    border-color: var(--color-acid);
+    color: var(--color-acid);
+  }
+  .more svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    transition: translate 0.3s var(--ease-out-expo);
+  }
+  .more:hover svg {
+    translate: 0.15rem -0.15rem;
+  }
+</style>

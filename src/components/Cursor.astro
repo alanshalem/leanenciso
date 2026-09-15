@@ -1,0 +1,53 @@
+---
+// Cursor propio. cursor.ts lo mueve y le cambia el modo.
+// Solo se muestra en punteros finos.
+---
+
+<div class="cursor" data-cursor aria-hidden="true"></div>
+
+<style>
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 99px;
+    background: var(--color-acid);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+    opacity: 0;
+    mix-blend-mode: difference;
+    transition:
+      width 0.28s var(--ease-out-expo),
+      height 0.28s var(--ease-out-expo),
+      opacity 0.2s linear,
+      border-radius 0.28s var(--ease-out-expo),
+      mix-blend-mode 0s;
+  }
+
+  .cursor[data-on] {
+    opacity: 1;
+  }
+
+  .cursor[data-mode='label'] {
+    width: 5.25rem;
+    height: 2.25rem;
+    border-radius: 99px;
+    mix-blend-mode: normal;
+  }
+
+  @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+// Sin uso hasta que haya testimonios reales. Ver `testimonios` en src/content.config.ts.
+import IphoneFrame from './IphoneFrame.astro';
+
+interface Props {
+  name: string;
+  handle: string;
+  role: string;
+  quote: string;
+  video: string;
+  poster: string;
+}
+
+const { name, handle, role, quote, video, poster } = Astro.props;
+---
+
+<article class="testi">
+  <IphoneFrame class="testi__clip" src={video} poster={poster} title={name} formato={handle} />
+
+  <blockquote class="testi__quote">
+    <p>{quote}</p>
+    <footer class="testi__who">
+      <span class="testi__name">{name}</span>
+      <span class="testi__role">{role}</span>
+    </footer>
+  </blockquote>
+</article>
+
+<style>
+  .testi {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  .testi :global(.meta) {
+    display: none;
+  }
+
+  /* Acá la protagonista es la cita, no el aparato. */
+  .testi__clip {
+    max-width: 13rem;
+  }
+
+  .testi__quote {
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .testi__quote p {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+  .testi__quote p::before {
+    content: '\201C';
+    color: var(--color-acid);
+    margin-right: 0.1em;
+  }
+  .testi__quote p::after {
+    content: '\201D';
+    color: var(--color-acid);
+  }
+
+  .testi__who {
+    display: grid;
+    gap: 0.15rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .testi__name {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .testi__role {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+</style>

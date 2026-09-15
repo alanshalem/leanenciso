@@ -1,0 +1,161 @@
+---
+import { nav, site, canales } from '../data/site';
+import LocalTime from './LocalTime.astro';
+
+const year = new Date().getFullYear();
+const principal = canales[0];
+---
+
+<footer class="foot" data-sec={principal ? 'Contacto' : undefined} id="contacto">
+  <div class="wrap">
+    <hr class="rule" />
+
+    <div class="foot__top">
+      {
+        principal && (
+          <div class="foot__col foot__col--main">
+            <p class="t-label">Trabajemos</p>
+            <a
+              class="foot__main"
+              href={principal.href}
+              target={principal.external ? '_blank' : undefined}
+              rel={principal.external ? 'noopener' : undefined}
+              data-cursor-label="ESCRIBIR"
+            >
+              {principal.display}
+            </a>
+          </div>
+        )
+      }
+
+      <div class="foot__col foot__col--links">
+        <p class="t-label">Ir a</p>
+        <ul>
+          {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </div>
+
+      {
+        canales.length > 0 && (
+          <div class="foot__col foot__col--links">
+            <p class="t-label">Contacto</p>
+            <ul>
+              {canales.map((canal) => (
+                <li>
+                  <a
+                    href={canal.href}
+                    target={canal.external ? '_blank' : undefined}
+                    rel={canal.external ? 'me noopener' : undefined}
+                  >
+                    {canal.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <p class="foot__name" aria-hidden="true">Enciso</p>
+
+    <hr class="rule" />
+
+    <div class="foot__bottom">
+      <span class="t-mono t-muted">© {year} {site.name}</span>
+      <span class="t-mono t-muted foot__clock">
+        {site.country} <LocalTime class="acid" />
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    padding-top: clamp(4rem, 10vw, 9rem);
+    padding-bottom: 4.5rem;
+  }
+
+  .foot__top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 2.5rem;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+
+  .foot__col {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .foot__col--main {
+    grid-column: span 2;
+  }
+
+  .foot__main {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line-strong);
+    transition: text-decoration-color 0.3s;
+    word-break: break-word;
+  }
+  .foot__main:hover {
+    text-decoration-color: var(--color-acid);
+  }
+
+  .foot__col--links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+  .foot__col--links a {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .foot__col--links a:hover {
+    color: var(--color-acid);
+  }
+
+  /* El apellido a sangre completa: la firma del pie. */
+  .foot__name {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 22vw, 22rem);
+    font-weight: 600;
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    margin: clamp(1rem, 4vw, 3rem) 0;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--line-strong);
+    user-select: none;
+  }
+
+  .foot__bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1.25rem;
+  }
+
+  .foot__clock {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 48rem) {
+    .foot__col--main {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
