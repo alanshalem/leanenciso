@@ -78,7 +78,6 @@ video: /videos/reels/${slug}.mp4
 poster: /posters/reels/${slug}.jpg
 duration: "${duration}"
 featured: false
-hero: false
 order: ${order}
 ---
 `,

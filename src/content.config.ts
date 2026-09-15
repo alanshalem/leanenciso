@@ -16,8 +16,6 @@ const reels = defineCollection({
     poster: z.string(),
     /** m:ss */
     duration: z.string(),
-    /** El reel del celular del hero. Si ninguno lo marca, se usa el primero por orden. */
-    hero: z.boolean().default(false),
     /** Aparece en la selección del home (hasta 3). */
     featured: z.boolean().default(false),
     order: z.number().int().default(99),

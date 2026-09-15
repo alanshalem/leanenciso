@@ -51,7 +51,6 @@ formato: "Talking head"
 video: /videos/reels/mi-reel.mp4
 poster: /posters/reels/mi-reel.jpg
 duration: "1:09"
-hero: false       # true = va en el celular del hero (uno solo)
 featured: false   # true = aparece en la selección del home (hasta 3)
 order: 7          # orden en Ejemplos
 ---

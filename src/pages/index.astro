@@ -12,8 +12,7 @@ import LocalTime from '../components/LocalTime.astro';
 import { site } from '../data/site';
 
 const reels = (await getCollection('reels')).sort((a, b) => a.data.order - b.data.order);
-const hero = reels.find((r) => r.data.hero) ?? reels[0];
-const destacados = reels.filter((r) => r.data.featured && r.id !== hero?.id).slice(0, 3);
+const destacados = reels.filter((r) => r.data.featured).slice(0, 3);
 const year = new Date().getFullYear();
 ---
 
@@ -35,20 +34,6 @@ const year = new Date().getFullYear();
           <span class="hero__line hero__line--2" aria-hidden="true">Enciso</span>
           <span class="sr-only">Leandro Enciso</span>
         </h1>
-
-        {
-          hero && (
-            <div class="hero__phone" data-parallax="40">
-              <IphoneFrame
-                src={hero.data.video}
-                poster={hero.data.poster}
-                title={hero.data.title}
-                formato={hero.data.formato}
-                duration={hero.data.duration}
-              />
-            </div>
-          )
-        }
       </div>
 
       <div class="hero__foot">
@@ -168,9 +153,6 @@ const year = new Date().getFullYear();
   }
 
   .hero__meta {
-    /* Por encima del celular: con parallax puede subir hasta esta fila. */
-    position: relative;
-    z-index: 3;
     display: flex;
     justify-content: space-between;
     gap: 1rem;
@@ -183,13 +165,10 @@ const year = new Date().getFullYear();
     gap: 0.35rem;
   }
 
-  /* "LEANDRO" mide 4.778em en Clash Display 700 con este tracking. En desktop
-     el nombre ocupa el ancho menos la columna del celular: el celular es más
-     alto que una línea de texto y, a ancho completo, tapaba la última letra.
-     --phone-w se declara acá pero sus cqw se resuelven donde se usa, contra
-     este contenedor. Se recorta por altura en pantallas bajas. */
+  /* El nombre calza exacto al ancho del contenedor: "LEANDRO" mide 4.778em
+     en Clash Display 700 con este tracking, así que 100/4.778 = 20.9cqw lo
+     lleva justo a borde. Se recorta por altura en pantallas bajas. */
   .hero__stage {
-    --phone-w: min(21cqw, 20svh, 12rem);
     position: relative;
     container-type: inline-size;
     display: grid;
@@ -198,7 +177,7 @@ const year = new Date().getFullYear();
 
   .hero__name {
     display: grid;
-    font-size: min(calc((100cqw - var(--phone-w) - 2rem) / 4.778), 30svh);
+    font-size: min(20.6cqw, 30svh);
   }
 
   .hero__line {
@@ -209,17 +188,6 @@ const year = new Date().getFullYear();
   .hero__line--2 {
     font-weight: 300;
     color: rgb(242 240 235 / 0.78);
-  }
-
-  /* Se apoya en el aire que deja "ENCISO", que es más corto que "LEANDRO".
-     El tope en svh evita que un marco 9:19.5 se estire por encima de la nav
-     en pantallas bajas: 20svh de ancho son 43svh de alto. */
-  .hero__phone {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: var(--phone-w);
-    z-index: 2;
   }
 
   .hero__foot {
@@ -265,18 +233,6 @@ const year = new Date().getFullYear();
   }
 
   @media (max-width: 60rem) {
-    .hero__stage {
-      gap: 2rem;
-    }
-    /* En mobile el celular baja debajo del nombre: vuelve el ancho completo. */
-    .hero__name {
-      font-size: min(20.6cqw, 30svh);
-    }
-    .hero__phone {
-      position: static;
-      width: clamp(9rem, 40cqw, 12rem);
-      justify-self: end;
-    }
     .hero__foot {
       flex-direction: column;
       align-items: start;
